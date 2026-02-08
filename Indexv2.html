@@ -1,0 +1,1837 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#16a34a">
+    <title>CARTY App</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="assets/icon-192.png" sizes="192x192">
+    <link rel="apple-touch-icon" href="assets/icon-192.png">
+    <style>
+        /* System font stack */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+            margin: 0;
+            padding: 0;
+            background-color: var(--gray-50);
+            color: var(--gray-900);
+            padding-bottom: 64px; /* Space for tab bar */
+        }
+
+        /* Color Palette */
+        :root {
+            /* Primary (Golf Green) */
+            --green-50: #f0fdf4;
+            --green-500: #22c55e;
+            --green-600: #16a34a;   /* Primary brand */
+            --green-700: #15803d;
+            --green-800: #166534;
+
+            /* Scoring */
+            --eagle: #fbbf24;       /* Gold */
+            --birdie: #34d399;      /* Emerald */
+            --par: #94a3b8;         /* Slate */
+            --bogey: #fb923c;       /* Orange */
+            --double-plus: #ef4444; /* Red */
+
+            /* Teams */
+            --team-a: #ef4444;      /* Red */
+            --team-b: #3b82f6;      /* Blue */
+
+            /* Neutrals */
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-500: #6b7280;
+            --gray-900: #111827;
+
+            /* Typography sizes */
+            --text-sm: 0.875rem;    /* 14px */
+            --text-base: 1rem;      /* 16px */
+            --text-lg: 1.125rem;    /* 18px */
+            --text-xl: 1.25rem;     /* 20px */
+            --text-2xl: 1.5rem;     /* 24px */
+            --text-3xl: 1.875rem;   /* 30px */
+        }
+
+        /* Basic resets and mobile-friendly */
+        * {
+            box-sizing: border-box;
+        }
+
+        /* Placeholder for screens */
+        .screen {
+            display: none;
+            padding: 1rem;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        /* Header with settings gear */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background-color: var(--gray-100);
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        #settings-gear {
+            font-size: var(--text-2xl);
+            cursor: pointer;
+            color: var(--gray-500);
+        }
+
+        #settings-gear:hover {
+            color: var(--green-600);
+        }
+
+        /* Tab bar */
+        #tab-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 64px;
+            background-color: var(--gray-50);
+            border-top: 1px solid var(--gray-200);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+
+        .tab-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: var(--gray-500);
+            text-decoration: none;
+            font-size: var(--text-sm);
+            cursor: pointer;
+        }
+
+        .tab-item.active {
+            color: var(--green-600);
+        }
+
+        .tab-icon {
+            font-size: 24px; /* Icon size per spec */
+        }
+
+        /* Player management styles */
+        #player-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .player-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding: 0.5rem;
+            background-color: var(--gray-100);
+            border-radius: 0.5rem;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-weight: bold;
+            margin-right: 1rem;
+        }
+
+        .player-info, .course-info {
+            flex-grow: 1;
+        }
+
+        .player-actions, .course-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        button {
+            padding: 0.5rem 1rem;
+            background-color: var(--green-600);
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            min-height: 44px;
+        }
+
+        button:hover {
+            background-color: var(--green-700);
+        }
+
+        button.secondary {
+            background-color: var(--gray-500);
+        }
+
+        button.danger {
+            background-color: var(--double-plus);
+        }
+
+        input {
+            padding: 0.5rem;
+            margin-bottom: 0.5rem;
+            width: 100%;
+            border: 1px solid var(--gray-200);
+            border-radius: 0.5rem;
+        }
+
+        select {
+            padding: 0.5rem;
+            margin-bottom: 0.5rem;
+            width: 100%;
+            border: 1px solid var(--gray-200);
+            border-radius: 0.5rem;
+        }
+
+        /* Course management styles */
+        #course-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .course-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding: 0.5rem;
+            background-color: var(--gray-100);
+            border-radius: 0.5rem;
+        }
+
+        #course-holes {
+            margin-top: 1rem;
+        }
+
+        .hole-input {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .hole-input input {
+            width: 33%;
+        }
+
+        /* Home dashboard styles */
+        .card {
+            background-color: var(--gray-100);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .quick-actions {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .quick-actions button {
+            flex: 1;
+        }
+
+        #countdown-widget {
+            font-size: var(--text-3xl);
+            text-align: center;
+            color: var(--green-600);
+        }
+
+        /* Casual round setup */
+        #casual-round-setup {
+            margin-top: 2rem;
+        }
+
+        #selected-players {
+            list-style: none;
+            padding: 0;
+        }
+
+        #available-players select {
+            height: 150px; /* For multiple select */
+        }
+
+        /* Play screen styles */
+        #play-content {
+            text-align: center;
+        }
+
+        #hole-info {
+            font-size: var(--text-2xl);
+            margin-bottom: 1rem;
+        }
+
+        .player-scores {
+            margin-bottom: 2rem;
+        }
+
+        .player-score {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .score-stepper {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .stepper-btn {
+            width: 60px;
+            height: 60px;
+            font-size: var(--text-2xl);
+            border-radius: 50%;
+            min-height: auto;
+        }
+
+        #gross-score {
+            font-size: var(--text-3xl);
+            width: 80px;
+            text-align: center;
+        }
+
+        #points-display {
+            font-size: var(--text-xl);
+            color: var(--green-600);
+        }
+
+        #running-total {
+            font-size: var(--text-lg);
+            margin-top: 1rem;
+        }
+
+        #hole-nav {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        #mini-leaderboard {
+            display: none;
+            margin-top: 1rem;
+        }
+
+        #mini-leaderboard.active {
+            display: block;
+        }
+
+        #h2h-status {
+            margin-top: 1rem;
+            font-style: italic;
+        }
+
+        #complete-round-btn {
+            margin-top: 2rem;
+            background-color: var(--green-500);
+        }
+
+        /* Competition management styles */
+        #competition-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .competition-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding: 0.5rem;
+            background-color: var(--gray-100);
+            border-radius: 0.5rem;
+        }
+
+        #team-assignment {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .team-column {
+            flex: 1;
+            padding: 1rem;
+            border-radius: 0.5rem;
+        }
+
+        .team-a {
+            background-color: var(--team-a);
+            color: white;
+        }
+
+        .team-b {
+            background-color: var(--team-b);
+            color: white;
+        }
+
+        .available-players-list {
+            margin-bottom: 1rem;
+        }
+
+        /* Pairings UI */
+        #pairings-setup {
+            margin-top: 1rem;
+        }
+
+        .pairing-row {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .pairing-row select {
+            flex: 1;
+        }
+
+        /* Leaderboard styles */
+        #leaderboard-tabs {
+            display: flex;
+            margin-bottom: 1rem;
+        }
+
+        .tab-button {
+            flex: 1;
+            padding: 0.5rem;
+            background-color: var(--gray-200);
+            border: none;
+            cursor: pointer;
+        }
+
+        .tab-button.active {
+            background-color: var(--green-600);
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 0.5rem;
+            border: 1px solid var(--gray-200);
+            text-align: left;
+        }
+
+        .expandable {
+            cursor: pointer;
+        }
+
+        .medal {
+            font-size: var(--text-lg);
+            margin-left: 0.5rem;
+        }
+
+        .match-details {
+            display: none;
+            padding: 0.5rem;
+            background-color: var(--gray-100);
+        }
+
+        /* Stats styles (similar to leaderboard) */
+        #stats-tabs {
+            display: flex;
+            margin-bottom: 1rem;
+        }
+
+        /* Manage history */
+        #manage-history {
+            margin-top: 2rem;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1 style="font-size: var(--text-xl); margin: 0;">CARTY App</h1>
+        <div id="settings-gear">⚙️</div>
+    </header>
+    <div id="app">
+        <div id="home" class="screen">
+            <h2>Home / Dashboard</h2>
+            <div id="active-competition-card" class="card">
+                <h3>Active Competition</h3>
+                <p id="active-comp-info">No active competition. Set one up in Settings.</p>
+            </div>
+            <div id="countdown-widget" class="card">
+                Days until CARTY: <span id="countdown-days">N/A</span>
+            </div>
+            <div id="your-position" class="card">
+                <h3>Your Position</h3>
+                <p>Individual: N/A | Team: N/A</p>
+            </div>
+            <div class="quick-actions">
+                <button onclick="startNewRound()">Start New Round</button>
+                <button onclick="viewLeaderboard()">View Leaderboard</button>
+                <button onclick="competitionSetup()">Competition Setup</button>
+            </div>
+            <div id="recent-activity" class="card">
+                <h3>Recent Activity</h3>
+                <p id="last-round">Last round: N/A</p>
+            </div>
+            <div id="quick-stats" class="card">
+                <h3>Quick Stats</h3>
+                <p id="quick-stats-content">Best Stableford: N/A | Handicap: 12 | Rounds Played: 0</p>
+            </div>
+        </div>
+        <div id="play" class="screen">
+            <div id="play-content">
+                <!-- Dynamic content here -->
+            </div>
+        </div>
+        <div id="leaderboard" class="screen">
+            <div id="leaderboard-tabs">
+                <button class="tab-button active" onclick="showLbTab('individual')">Individual</button>
+                <button class="tab-button" onclick="showLbTab('team')">Team</button>
+                <button class="tab-button" onclick="showLbTab('history')">History</button>
+            </div>
+            <div id="individual-tab" class="tab-content active">
+                <h3>CARTY Individual Standings</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Name</th>
+                            <th>Points</th>
+                            <th>Gross</th>
+                            <th>Net</th>
+                            <th>HCP</th>
+                            <th>Front 9</th>
+                            <th>Back 9</th>
+                        </tr>
+                    </thead>
+                    <tbody id="individual-body"></tbody>
+                </table>
+            </div>
+            <div id="team-tab" class="tab-content">
+                <h3>Team Competition</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Team</th>
+                            <th>Total Points</th>
+                            <th>Day 1</th>
+                            <th>Day 2</th>
+                            <th>Bonus</th>
+                        </tr>
+                    </thead>
+                    <tbody id="team-body"></tbody>
+                </table>
+                <div id="match-breakdown"></div>
+            </div>
+            <div id="history-tab" class="tab-content">
+                <h3>Past CARTY Winners</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Year</th>
+                            <th>Winner</th>
+                            <th>Points</th>
+                        </tr>
+                    </thead>
+                    <tbody id="history-body"></tbody>
+                </table>
+            </div>
+        </div>
+        <div id="stats" class="screen">
+            <div id="stats-tabs">
+                <button class="tab-button active" onclick="showStatsTab('personal')">Personal</button>
+                <button class="tab-button" onclick="showStatsTab('carty-history')">CARTY History</button>
+                <button class="tab-button" onclick="showStatsTab('course-records')">Course Records</button>
+                <button class="tab-button" onclick="showStatsTab('head-to-head')">Head-to-Head</button>
+            </div>
+            <div id="personal-tab" class="tab-content active">
+                <h3>Personal Stats</h3>
+                <p>Best Stableford: <span id="best-stableford"></span></p>
+                <p>Best Gross: <span id="best-gross"></span></p>
+                <p>Average Stableford: <span id="avg-stableford"></span></p>
+                <p>Rounds Played: <span id="rounds-played"></span></p>
+                <p>Handicap: <span id="handicap"></span></p>
+            </div>
+            <div id="carty-history-tab" class="tab-content">
+                <h3>CARTY History</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Year</th>
+                            <th>Winner</th>
+                            <th>Points</th>
+                        </tr>
+                    </thead>
+                    <tbody id="carty-history-body"></tbody>
+                </table>
+            </div>
+            <div id="course-records-tab" class="tab-content">
+                <h3>Course Records</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Course</th>
+                            <th>Best Score</th>
+                            <th>Player</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody id="course-records-body"></tbody>
+                </table>
+            </div>
+            <div id="head-to-head-tab" class="tab-content">
+                <h3>Head-to-Head Records</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Opponent</th>
+                            <th>Win/Loss/Draw</th>
+                        </tr>
+                    </thead>
+                    <tbody id="head-to-head-body"></tbody>
+                </table>
+            </div>
+        </div>
+        <div id="info" class="screen">
+            <h2>Info</h2>
+            <p>Placeholder for event logistics.</p>
+        </div>
+        <div id="settings" class="screen">
+            <h2>Settings</h2>
+            <div id="player-management">
+                <h3>Player Management</h3>
+                <ul id="player-list"></ul>
+                <form id="player-form">
+                    <input type="text" id="player-name" placeholder="Name" required>
+                    <input type="number" id="player-handicap" placeholder="Handicap" required>
+                    <button type="submit">Add Player</button>
+                </form>
+            </div>
+            <div id="course-management" style="margin-top: 2rem;">
+                <h3>Course Management</h3>
+                <ul id="course-list"></ul>
+                <form id="course-form">
+                    <input type="text" id="course-name" placeholder="Course Name" required>
+                    <div id="course-holes">
+                        <!-- Holes will be generated here -->
+                    </div>
+                    <button type="button" id="quick-setup">Quick Setup (All Par 4, SI 1-18)</button>
+                    <button type="submit">Add Course</button>
+                </form>
+            </div>
+            <div id="casual-round-setup" style="margin-top: 2rem;">
+                <h3>Casual Round Setup</h3>
+                <form id="casual-round-form">
+                    <select id="casual-course" required>
+                        <option value="">Select Course</option>
+                    </select>
+                    <div id="available-players">
+                        <label>Players (select 2-4):</label>
+                        <select id="casual-players" multiple required size="10"></select>
+                    </div>
+                    <button type="submit">Start Casual Round</button>
+                </form>
+            </div>
+            <div id="competition-management" style="margin-top: 2rem;">
+                <h3>Competition Management</h3>
+                <ul id="competition-list"></ul>
+                <form id="competition-form">
+                    <input type="text" id="comp-name" placeholder="Competition Name (e.g., CARTY 2025)" required>
+                    <input type="date" id="comp-start" placeholder="Start Date" required>
+                    <input type="date" id="comp-end" placeholder="End Date" required>
+                    <div class="available-players-list">
+                        <label>Assign Players to Teams (select 5 for each):</label>
+                        <select id="comp-players" multiple required size="10"></select>
+                    </div>
+                    <div id="team-assignment">
+                        <div class="team-column team-a">
+                            <h4>Team A</h4>
+                            <ul id="team-a-list"></ul>
+                        </div>
+                        <div class="team-column team-b">
+                            <h4>Team B</h4>
+                            <ul id="team-b-list"></ul>
+                        </div>
+                    </div>
+                    <button type="submit">Create Competition</button>
+                </form>
+                <div id="pairings-setup" style="margin-top: 2rem; display: none;">
+                    <h4>Set Day 1 Head-to-Head Pairings</h4>
+                    <div id="pairings-rows"></div>
+                    <button onclick="savePairings()">Save Pairings</button>
+                </div>
+            </div>
+            <div id="manage-history" style="margin-top: 2rem;">
+                <h3>Manage History</h3>
+                <form id="history-form">
+                    <input type="number" id="history-year" placeholder="Year" required>
+                    <select id="history-winner" required>
+                        <option value="">Select Winner</option>
+                    </select>
+                    <input type="number" id="history-points" placeholder="Points" required>
+                    <button type="submit">Add Past Winner</button>
+                </form>
+                <form id="record-form" style="margin-top: 1rem;">
+                    <select id="record-type" required>
+                        <option value="">Select Record Type</option>
+                        <option value="highest_stableford">Highest Stableford</option>
+                        <option value="lowest_gross">Lowest Gross</option>
+                    </select>
+                    <select id="record-player" required>
+                        <option value="">Select Player</option>
+                    </select>
+                    <input type="number" id="record-value" placeholder="Value" required>
+                    <input type="date" id="record-date" placeholder="Date" required>
+                    <select id="record-course" required>
+                        <option value="">Select Course</option>
+                    </select>
+                    <button type="submit">Add Record</button>
+                </form>
+            </div>
+            <!-- More settings sections to be added later -->
+        </div>
+    </div>
+    <nav id="tab-bar">
+        <div class="tab-item" data-screen="home">
+            <span class="tab-icon">🏠</span>
+            Home
+        </div>
+        <div class="tab-item" data-screen="play">
+            <span class="tab-icon">⛳</span>
+            Play
+        </div>
+        <div class="tab-item" data-screen="leaderboard">
+            <span class="tab-icon">🏆</span>
+            Board
+        </div>
+        <div class="tab-item" data-screen="stats">
+            <span class="tab-icon">📊</span>
+            Stats
+        </div>
+        <div class="tab-item" data-screen="info">
+            <span class="tab-icon">ℹ️</span>
+            Info
+        </div>
+    </nav>
+
+    <script>
+        // Debounce function
+        function debounce(func, delay) {
+            let timeout;
+            return function(...args) {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func.apply(this, args), delay);
+            };
+        }
+
+        // Global AppState
+        const AppState = {
+            app_version: "2.1.0",
+            user_profile: {
+                name: "Matthew",
+                default_handicap: 12,
+                preferences: { theme: "auto" }
+            },
+            players: [],
+            courses: [],
+            competitions: [],
+            history: {
+                carty_winners: [],
+                records: {}
+            },
+            currentScreen: 'home',
+            activeCompetition: null,
+            currentRound: null,
+            currentHole: 0,
+            theme: 'auto',
+
+            serialize() {
+                // Return a copy without methods
+                return {
+                    app_version: this.app_version,
+                    user_profile: this.user_profile,
+                    players: this.players,
+                    courses: this.courses,
+                    competitions: this.competitions,
+                    history: this.history,
+                    currentScreen: this.currentScreen,
+                    activeCompetition: this.activeCompetition,
+                    currentRound: this.currentRound,
+                    currentHole: this.currentHole,
+                    theme: this.theme
+                };
+            },
+
+            save: debounce(function() {
+                localStorage.setItem('carty_data', JSON.stringify(this.serialize()));
+            }, 500),
+
+            load() {
+                const data = localStorage.getItem('carty_data');
+                if (data) {
+                    const parsed = JSON.parse(data);
+                    Object.assign(this, parsed);
+                }
+                // Apply theme or other init
+                this.applyTheme();
+            },
+
+            applyTheme() {
+                // Placeholder for theme application (expanded in later tasks)
+                if (this.theme === 'dark') {
+                    document.body.style.backgroundColor = '#111827';
+                    document.body.style.color = '#f9fafb';
+                } else {
+                    // Light/default
+                    document.body.style.backgroundColor = '#f9fafb';
+                    document.body.style.color = '#111827';
+                }
+            }
+        };
+
+        // Load state on init
+        AppState.load();
+
+        // Screen switcher
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            const targetScreen = document.getElementById(screenId);
+            if (targetScreen) {
+                targetScreen.classList.add('active');
+            }
+            // Update active tab
+            document.querySelectorAll('.tab-item').forEach(item => {
+                item.classList.remove('active');
+                if (item.dataset.screen === screenId) {
+                    item.classList.add('active');
+                }
+            });
+            AppState.currentScreen = screenId;
+            AppState.save();
+            // Render screen-specific content
+            if (screenId === 'play') {
+                renderPlayScreen();
+            } else if (screenId === 'settings') {
+                renderCasualRoundSetup();
+                renderCompetitionManagement();
+                renderManageHistory();
+            } else if (screenId === 'home') {
+                renderHomeDashboard();
+            } else if (screenId === 'leaderboard') {
+                renderLeaderboard();
+            } else if (screenId === 'stats') {
+                renderStatsScreen();
+            }
+        }
+
+        // Hash-based routing
+        function handleHashChange() {
+            let hash = window.location.hash.slice(2); // Remove '#/'
+            if (!hash) hash = 'home';
+            showScreen(hash);
+        }
+
+        window.addEventListener('hashchange', handleHashChange);
+
+        // Tab bar clicks
+        document.querySelectorAll('.tab-item').forEach(item => {
+            item.addEventListener('click', () => {
+                const screenId = item.dataset.screen;
+                window.location.hash = '#/' + screenId;
+            });
+        });
+
+        // Settings gear click
+        document.getElementById('settings-gear').addEventListener('click', () => {
+            window.location.hash = '#/settings';
+        });
+
+        // Initial setup
+        handleHashChange();
+
+        // Player Management Functions
+        function getInitials(name) {
+            const parts = name.trim().split(' ');
+            if (parts.length >= 2) {
+                return parts[0].charAt(0).toUpperCase() + parts[parts.length - 1].charAt(0).toUpperCase();
+            }
+            return parts[0].charAt(0).toUpperCase();
+        }
+
+        function getAvatarColor(name) {
+            let hash = 0;
+            for (let i = 0; i < name.length; i++) {
+                hash = name.charCodeAt(i) + ((hash << 5) - hash);
+            }
+            const colors = [
+                '#16a34a', '#ef4444', '#3b82f6', '#fbbf24', '#34d399',
+                '#fb923c', '#94a3b8', '#15803d', '#166534', '#22c55e'
+            ];
+            return colors[Math.abs(hash) % colors.length];
+        }
+
+        function renderPlayerList() {
+            const list = document.getElementById('player-list');
+            list.innerHTML = '';
+            AppState.players.forEach(player => {
+                const li = document.createElement('li');
+                li.className = 'player-item';
+                li.innerHTML = `
+                    <div class="avatar" style="background-color: ${player.avatar_color};">${player.initials}</div>
+                    <div class="player-info">
+                        <strong>${player.name}</strong><br>
+                        Handicap: ${player.handicap}
+                    </div>
+                    <div class="player-actions">
+                        <button class="secondary" onclick="editPlayer('${player.id}')">Edit</button>
+                        <button class="danger" onclick="removePlayer('${player.id}')">Remove</button>
+                    </div>
+                `;
+                list.appendChild(li);
+            });
+        }
+
+        function addOrUpdatePlayer(event) {
+            event.preventDefault();
+            const name = document.getElementById('player-name').value.trim();
+            const handicap = parseInt(document.getElementById('player-handicap').value, 10);
+            if (!name || isNaN(handicap)) return;
+
+            const form = document.getElementById('player-form');
+            const editingId = form.dataset.editingId;
+
+            if (editingId) {
+                // Update existing
+                const player = AppState.players.find(p => p.id === editingId);
+                if (player) {
+                    player.name = name;
+                    player.handicap = handicap;
+                    player.initials = getInitials(name);
+                    player.avatar_color = getAvatarColor(name);
+                }
+            } else {
+                // Add new
+                const id = 'player_' + (AppState.players.length + 1).toString().padStart(3, '0');
+                const initials = getInitials(name);
+                const avatar_color = getAvatarColor(name);
+                AppState.players.push({
+                    id,
+                    name,
+                    handicap,
+                    initials,
+                    avatar_color,
+                    stats: {
+                        rounds_played: 0,
+                        best_stableford: 0,
+                        best_gross: Infinity,
+                        avg_stableford: 0
+                    }
+                });
+            }
+
+            form.reset();
+            delete form.dataset.editingId;
+            form.querySelector('button[type="submit"]').textContent = 'Add Player';
+            renderPlayerList();
+            AppState.save();
+        }
+
+        function editPlayer(id) {
+            const player = AppState.players.find(p => p.id === id);
+            if (player) {
+                document.getElementById('player-name').value = player.name;
+                document.getElementById('player-handicap').value = player.handicap;
+                const form = document.getElementById('player-form');
+                form.dataset.editingId = id;
+                form.querySelector('button[type="submit"]').textContent = 'Update Player';
+            }
+        }
+
+        function removePlayer(id) {
+            if (confirm('Are you sure you want to remove this player?')) {
+                AppState.players = AppState.players.filter(p => p.id !== id);
+                renderPlayerList();
+                AppState.save();
+            }
+        }
+
+        // Course Management Functions
+        function renderCourseList() {
+            const list = document.getElementById('course-list');
+            list.innerHTML = '';
+            AppState.courses.forEach(course => {
+                const li = document.createElement('li');
+                li.className = 'course-item';
+                li.innerHTML = `
+                    <div class="course-info">
+                        <strong>${course.name}</strong><br>
+                        Total Par: ${course.total_par}
+                    </div>
+                    <div class="course-actions">
+                        <button class="secondary" onclick="editCourse('${course.id}')">Edit</button>
+                        <button class="danger" onclick="removeCourse('${course.id}')">Remove</button>
+                    </div>
+                `;
+                list.appendChild(li);
+            });
+        }
+
+        function generateHoleInputs(holes = []) {
+            const container = document.getElementById('course-holes');
+            container.innerHTML = '';
+            for (let i = 1; i <= 18; i++) {
+                const div = document.createElement('div');
+                div.className = 'hole-input';
+                const existingHole = holes.find(h => h.number === i) || { par: '', stroke_index: '', yardage: '' };
+                div.innerHTML = `
+                    <input type="number" name="par-${i}" placeholder="Par Hole ${i}" value="${existingHole.par || ''}" required>
+                    <input type="number" name="si-${i}" placeholder="SI Hole ${i}" value="${existingHole.stroke_index || ''}" required>
+                    <input type="number" name="yardage-${i}" placeholder="Yardage Hole ${i}" value="${existingHole.yardage || ''}">
+                `;
+                container.appendChild(div);
+            }
+        }
+
+        function quickSetup() {
+            const inputs = document.querySelectorAll('#course-holes input');
+            let index = 0;
+            for (let i = 1; i <= 18; i++) {
+                inputs[index++].value = 4; // Par 4
+                inputs[index++].value = i; // SI 1-18
+                inputs[index++].value = ''; // Yardage empty
+            }
+        }
+
+        function addOrUpdateCourse(event) {
+            event.preventDefault();
+            const name = document.getElementById('course-name').value.trim();
+            if (!name) return;
+
+            const holes = [];
+            let total_par = 0;
+            for (let i = 1; i <= 18; i++) {
+                const par = parseInt(document.querySelector(`input[name="par-${i}"]`).value, 10);
+                const si = parseInt(document.querySelector(`input[name="si-${i}"]`).value, 10);
+                const yardage = parseInt(document.querySelector(`input[name="yardage-${i}"]`).value, 10) || 0;
+                if (isNaN(par) || isNaN(si)) return; // Validation
+                holes.push({ number: i, par, stroke_index: si, yardage });
+                total_par += par;
+            }
+
+            const form = document.getElementById('course-form');
+            const editingId = form.dataset.editingId;
+
+            if (editingId) {
+                // Update existing
+                const course = AppState.courses.find(c => c.id === editingId);
+                if (course) {
+                    course.name = name;
+                    course.holes = holes;
+                    course.total_par = total_par;
+                }
+            } else {
+                // Add new
+                const id = 'course_' + (AppState.courses.length + 1).toString().padStart(3, '0');
+                AppState.courses.push({
+                    id,
+                    name,
+                    holes,
+                    total_par
+                });
+            }
+
+            form.reset();
+            delete form.dataset.editingId;
+            form.querySelector('button[type="submit"]').textContent = 'Add Course';
+            generateHoleInputs(); // Reset holes
+            renderCourseList();
+            AppState.save();
+        }
+
+        function editCourse(id) {
+            const course = AppState.courses.find(c => c.id === id);
+            if (course) {
+                document.getElementById('course-name').value = course.name;
+                generateHoleInputs(course.holes);
+                const form = document.getElementById('course-form');
+                form.dataset.editingId = id;
+                form.querySelector('button[type="submit"]').textContent = 'Update Course';
+            }
+        }
+
+        function removeCourse(id) {
+            if (confirm('Are you sure you want to remove this course?')) {
+                AppState.courses = AppState.courses.filter(c => c.id !== id);
+                renderCourseList();
+                AppState.save();
+            }
+        }
+
+        // Home Dashboard Functions
+        function renderHomeDashboard() {
+            // Active Competition Card
+            const activeComp = AppState.activeCompetition ? AppState.competitions.find(c => c.id === AppState.activeCompetition) : null;
+            document.getElementById('active-comp-info').textContent = activeComp ? `${activeComp.name} - ${activeComp.type} - Status: ${activeComp.status}` : 'No active competition. Set one up in Settings.';
+
+            // Countdown Widget
+            const countdownDays = activeComp && activeComp.start_date ? Math.ceil((new Date(activeComp.start_date) - new Date()) / (1000 * 60 * 60 * 24)) : 'N/A';
+            document.getElementById('countdown-days').textContent = countdownDays;
+
+            // Your Position (stub)
+            // Full in later phases
+
+            // Recent Activity (last round from history)
+            const lastRound = AppState.history.records.last_round || { date: 'N/A', score: 'N/A' };
+            document.getElementById('last-round').textContent = `Last round: ${lastRound.date} - Score: ${lastRound.score}`;
+
+            // Quick Stats (from user_profile and stats)
+            const user = AppState.players.find(p => p.name === AppState.user_profile.name) || { stats: { best_stableford: 'N/A', rounds_played: 0 } };
+            document.getElementById('quick-stats-content').innerHTML = `<p>Best Stableford: ${user.stats.best_stableford} | Handicap: ${AppState.user_profile.default_handicap} | Rounds Played: ${user.stats.rounds_played}</p>`;
+        }
+
+        // Quick Action Stubs (full in later tasks)
+        function startNewRound() {
+            window.location.hash = '#/settings'; // For now, go to settings to setup
+            // In full, could open a modal
+        }
+
+        function viewLeaderboard() {
+            window.location.hash = '#/leaderboard';
+        }
+
+        function competitionSetup() {
+            window.location.hash = '#/settings';
+        }
+
+        // Casual Round Setup Functions
+        function renderCasualRoundSetup() {
+            // Populate courses
+            const courseSelect = document.getElementById('casual-course');
+            courseSelect.innerHTML = '<option value="">Select Course</option>';
+            AppState.courses.forEach(course => {
+                const option = document.createElement('option');
+                option.value = course.id;
+                option.textContent = course.name;
+                courseSelect.appendChild(option);
+            });
+
+            // Populate players
+            const playerSelect = document.getElementById('casual-players');
+            playerSelect.innerHTML = '';
+            AppState.players.forEach(player => {
+                const option = document.createElement('option');
+                option.value = player.id;
+                option.textContent = `${player.name} (HCP: ${player.handicap})`;
+                playerSelect.appendChild(option);
+            });
+        }
+
+        function startCasualRound(event) {
+            event.preventDefault();
+            const courseId = document.getElementById('casual-course').value;
+            const selectedPlayers = Array.from(document.getElementById('casual-players').selectedOptions).map(opt => opt.value);
+
+            if (!courseId || selectedPlayers.length < 2 || selectedPlayers.length > 4) {
+                alert('Select a course and 2-4 players.');
+                return;
+            }
+
+            // Create round structure
+            AppState.currentRound = {
+                type: 'casual',
+                course_id: courseId,
+                players: selectedPlayers.map(id => {
+                    const player = AppState.players.find(p => p.id === id);
+                    return {
+                        player_id: id,
+                        handicap: player.handicap,
+                        holes: new Array(18).fill(null).map(() => ({ gross: null, strokes_received: 0, net: null, points: 0, score_type: null })),
+                        front_9: 0,
+                        back_9: 0,
+                        total_points: 0,
+                        gross_total: 0
+                    };
+                }),
+                status: 'active'
+            };
+
+            // Calculate strokes for each player
+            const courseHoles = AppState.courses.find(c => c.id === courseId).holes;
+            AppState.currentRound.players.forEach(p => {
+                p.strokes_per_hole = allocateStrokes(p.handicap, courseHoles);
+            });
+
+            AppState.currentHole = 0;
+            AppState.save();
+            window.location.hash = '#/play'; // Switch to play screen
+        }
+
+        // Play Screen Rendering (Stableford Mode)
+        function renderPlayScreen() {
+            const content = document.getElementById('play-content');
+            content.innerHTML = '';
+            if (!AppState.currentRound || AppState.currentRound.status !== 'active') {
+                content.innerHTML = '<p>No active round. Start one from Settings.</p>';
+                return;
+            }
+
+            const holeIndex = AppState.currentHole;
+            const course = AppState.courses.find(c => c.id === AppState.currentRound.course_id);
+            const hole = course.holes[holeIndex];
+
+            // Hole Info
+            const holeInfo = document.createElement('div');
+            holeInfo.id = 'hole-info';
+            holeInfo.innerHTML = `Hole ${hole.number} - Par ${hole.par} - SI ${hole.stroke_index}`;
+            content.appendChild(holeInfo);
+
+            // Navigation
+            const nav = document.createElement('div');
+            nav.id = 'hole-nav';
+            nav.innerHTML = `
+                <button onclick="changeHole(-1)" ${holeIndex === 0 ? 'disabled' : ''}>←</button>
+                <span>Hole ${holeIndex + 1}/18</span>
+                <button onclick="changeHole(1)" ${holeIndex === 17 ? 'disabled' : ''}>→</button>
+            `;
+            content.appendChild(nav);
+
+            // Player Scores
+            const playerScores = document.createElement('div');
+            playerScores.className = 'player-scores';
+            AppState.currentRound.players.forEach((p, idx) => {
+                const player = AppState.players.find(pl => pl.id === p.player_id);
+                const holeData = p.holes[holeIndex];
+                const strokes = p.strokes_per_hole[holeIndex];
+                const points = holeData.points;
+                const gross = holeData.gross || '';
+
+                const div = document.createElement('div');
+                div.className = 'player-score';
+                div.innerHTML = `
+                    <span>${player.name}</span>
+                    <div class="score-stepper">
+                        <button class="stepper-btn" onclick="updateScore(${idx}, -1)">-</button>
+                        <input type="number" id="gross-${idx}" value="${gross}" readonly style="border: none; background: transparent;">
+                        <button class="stepper-btn" onclick="updateScore(${idx}, 1)">+</button>
+                    </div>
+                    <span id="points-${idx}">Points: ${points}</span>
+                `;
+                playerScores.appendChild(div);
+            });
+            content.appendChild(playerScores);
+
+            // Running Total
+            const runningTotal = document.createElement('div');
+            runningTotal.id = 'running-total';
+            runningTotal.textContent = `Running Total: ${calculateRunningTotal()}`;
+            content.appendChild(runningTotal);
+
+            // Mini Leaderboard Toggle
+            const toggleBtn = document.createElement('button');
+            toggleBtn.textContent = 'Toggle Mini Leaderboard';
+            toggleBtn.onclick = () => {
+                const lb = document.getElementById('mini-leaderboard');
+                lb.classList.toggle('active');
+            };
+            content.appendChild(toggleBtn);
+
+            const miniLb = document.createElement('div');
+            miniLb.id = 'mini-leaderboard';
+            miniLb.innerHTML = renderMiniLeaderboard();
+            content.appendChild(miniLb);
+
+            // Head-to-head status (for Day 1)
+            if (AppState.activeCompetition && AppState.currentRound.type === 'stableford') {  // Assume Day 1 is stableford
+                const h2h = document.createElement('div');
+                h2h.id = 'h2h-status';
+                h2h.textContent = getHeadToHeadStatus();
+                content.appendChild(h2h);
+            }
+
+            // Complete Round Button (if all holes scored)
+            if (isRoundComplete()) {
+                const completeBtn = document.createElement('button');
+                completeBtn.id = 'complete-round-btn';
+                completeBtn.textContent = 'Complete Round';
+                completeBtn.onclick = completeRound;
+                content.appendChild(completeBtn);
+            }
+
+            // Swipe navigation (basic touch events)
+            let touchStartX = 0;
+            content.addEventListener('touchstart', e => touchStartX = e.changedTouches[0].screenX);
+            content.addEventListener('touchend', e => {
+                const touchEndX = e.changedTouches[0].screenX;
+                if (touchStartX - touchEndX > 50) changeHole(1);
+                if (touchEndX - touchStartX > 50) changeHole(-1);
+            });
+        }
+
+        // Update Score
+        function updateScore(playerIdx, delta) {
+            const player = AppState.currentRound.players[playerIdx];
+            const holeIndex = AppState.currentHole;
+            let gross = player.holes[holeIndex].gross || 0;
+            gross = Math.max(0, gross + delta);
+            player.holes[holeIndex].gross = gross;
+
+            // Calculate points and score type
+            const course = AppState.courses.find(c => c.id === AppState.currentRound.course_id);
+            const hole = course.holes[holeIndex];
+            const strokes = player.strokes_per_hole[holeIndex];
+            player.holes[holeIndex].strokes_received = strokes;
+            player.holes[holeIndex].net = gross - strokes;
+            player.holes[holeIndex].points = calculateStablefordPoints(gross, hole.par, strokes);
+            player.holes[holeIndex].score_type = getScoreType(player.holes[holeIndex].net - hole.par);
+
+            // Update totals
+            updatePlayerTotals(player);
+
+            // Update UI
+            document.getElementById(`gross-${playerIdx}`).value = gross;
+            document.getElementById(`points-${playerIdx}`).textContent = `Points: ${player.holes[holeIndex].points}`;
+            document.getElementById('running-total').textContent = `Running Total: ${calculateRunningTotal()}`;
+            document.getElementById('mini-leaderboard').innerHTML = renderMiniLeaderboard();
+
+            // Check if round complete
+            if (isRoundComplete()) {
+                const content = document.getElementById('play-content');
+                if (!document.getElementById('complete-round-btn')) {
+                    const completeBtn = document.createElement('button');
+                    completeBtn.id = 'complete-round-btn';
+                    completeBtn.textContent = 'Complete Round';
+                    completeBtn.onclick = completeRound;
+                    content.appendChild(completeBtn);
+                }
+            }
+
+            AppState.save();
+        }
+
+        // Change Hole
+        function changeHole(delta) {
+            const newIndex = AppState.currentHole + delta;
+            if (newIndex < 0 || newIndex > 17) return;
+            if (delta < 0 && confirm('Edit previous hole?')) {
+                AppState.currentHole = newIndex;
+                AppState.save();
+                renderPlayScreen();
+            } else if (delta > 0) {
+                AppState.currentHole = newIndex;
+                AppState.save();
+                renderPlayScreen();
+            }
+        }
+
+        // Calculate Running Total (stub for multi-player, shows for first)
+        function calculateRunningTotal() {
+            const player = AppState.currentRound.players[0]; // Update for multi in future
+            return player.total_points;
+        }
+
+        // Render Mini Leaderboard
+        function renderMiniLeaderboard() {
+            const sorted = [...AppState.currentRound.players].sort((a, b) => b.total_points - a.total_points);
+            let html = '<h4>Top 3</h4><ul>';
+            sorted.slice(0, 3).forEach(p => {
+                const name = AppState.players.find(pl => pl.id === p.player_id).name;
+                html += `<li>${name}: ${p.total_points} pts</li>`;
+            });
+            html += '</ul>';
+            return html;
+        }
+
+        // Stableford Calculation from Spec
+        function calculateStablefordPoints(grossScore, par, strokesReceived) {
+            if (grossScore === null) return 0;
+            const netScore = grossScore - strokesReceived;
+            const relativeToPar = netScore - par;
+            return Math.max(0, 2 - relativeToPar);
+        }
+
+        // Get Score Type
+        function getScoreType(relativeToPar) {
+            if (relativeToPar <= -3) return 'double eagle+';
+            if (relativeToPar === -2) return 'eagle';
+            if (relativeToPar === -1) return 'birdie';
+            if (relativeToPar === 0) return 'par';
+            if (relativeToPar === 1) return 'bogey';
+            return 'double bogey+';
+        }
+
+        // Update Player Totals
+        function updatePlayerTotals(player) {
+            player.front_9 = player.holes.slice(0, 9).reduce((sum, h) => sum + (h ? h.points : 0), 0);
+            player.back_9 = player.holes.slice(9, 18).reduce((sum, h) => sum + (h ? h.points : 0), 0);
+            player.total_points = player.front_9 + player.back_9;
+            player.gross_total = player.holes.reduce((sum, h) => sum + (h ? h.gross || 0 : 0), 0);
+        }
+
+        // Check if Round Complete
+        function isRoundComplete() {
+            return AppState.currentRound.players.every(p => p.holes.every(h => h.gross !== null));
+        }
+
+        // Complete Round
+        function completeRound() {
+            AppState.currentRound.status = 'completed';
+            AppState.currentRound.completed_date = new Date().toISOString().split('T')[0];
+
+            // Update player stats
+            AppState.currentRound.players.forEach(roundPlayer => {
+                const player = AppState.players.find(p => p.id === roundPlayer.player_id);
+                if (player) {
+                    player.stats.rounds_played++;
+                    player.stats.best_stableford = Math.max(player.stats.best_stableford, roundPlayer.total_points);
+                    player.stats.best_gross = Math.min(player.stats.best_gross, roundPlayer.gross_total);
+                    player.stats.avg_stableford = ((player.stats.avg_stableford * (player.stats.rounds_played - 1)) + roundPlayer.total_points) / player.stats.rounds_played;
+                }
+            });
+
+            // Determine winner and booby
+            const sortedPlayers = [...AppState.currentRound.players].sort((a, b) => {
+                if (b.total_points !== a.total_points) return b.total_points - a.total_points;
+                if (b.back_9 !== a.back_9) return b.back_9 - a.back_9;
+                // Countback from 18th
+                for (let i = 17; i >= 0; i--) {
+                    if (b.holes[i].points !== a.holes[i].points) return b.holes[i].points - a.holes[i].points;
+                }
+                return 0;
+            });
+            const winner = sortedPlayers[0];
+            const booby = sortedPlayers[sortedPlayers.length - 1];
+
+            alert(`Round complete! Winner: ${AppState.players.find(p => p.id === winner.player_id).name} (${winner.total_points} pts)\nBooby: ${AppState.players.find(p => p.id === booby.player_id).name} (${booby.total_points} pts)`);
+
+            // Update history (stub, full in Phase 5)
+            AppState.history.records.last_round = {
+                date: AppState.currentRound.completed_date,
+                score: winner.total_points // Example
+            };
+
+            AppState.currentRound = null;
+            AppState.currentHole = 0;
+            AppState.save();
+            window.location.hash = '#/home';
+        }
+
+        // Strokes Allocation from Spec
+        function allocateStrokes(playerHandicap, holes) {
+            const baseStrokes = Math.floor(playerHandicap / 18);
+            const extraStrokes = playerHandicap % 18;
+            const strokesPerHole = new Array(18).fill(baseStrokes);
+            const sortedBySI = holes
+                .map((hole, idx) => ({ idx, si: hole.stroke_index }))
+                .sort((a, b) => a.si - b.si);
+            for (let i = 0; i < extraStrokes; i++) {
+                strokesPerHole[sortedBySI[i].idx]++;
+            }
+            return strokesPerHole;
+        }
+
+        // Competition Management Functions
+        function renderCompetitionManagement() {
+            // Populate list
+            const list = document.getElementById('competition-list');
+            list.innerHTML = '';
+            AppState.competitions.forEach(comp => {
+                const li = document.createElement('li');
+                li.className = 'competition-item';
+                li.innerHTML = `
+                    <div class="course-info">  <!-- Reuse style */
+                        <strong>${comp.name}</strong><br>
+                        Dates: ${comp.start_date} to ${comp.end_date} - Status: ${comp.status}
+                    </div>
+                    <div class="course-actions">
+                        <button class="secondary" onclick="setActiveCompetition('${comp.id}')">Set Active</button>
+                        <button class="secondary" onclick="renderPairingsSetup('${comp.id}')">Set Pairings</button>
+                        <button class="danger" onclick="removeCompetition('${comp.id}')">Remove</button>
+                    </div>
+                `;
+                list.appendChild(li);
+            });
+
+            // Populate players for assignment
+            const playerSelect = document.getElementById('comp-players');
+            playerSelect.innerHTML = '';
+            AppState.players.forEach(player => {
+                const option = document.createElement('option');
+                option.value = player.id;
+                option.textContent = `${player.name} (HCP: ${player.handicap})`;
+                playerSelect.appendChild(option);
+            });
+
+            // Team lists (stub, drag/drop or select to assign in full, but for now manual select)
+            document.getElementById('team-a-list').innerHTML = '';
+            document.getElementById('team-b-list').innerHTML = '';
+        }
+
+        function createCompetition(event) {
+            event.preventDefault();
+            const name = document.getElementById('comp-name').value.trim();
+            const start = document.getElementById('comp-start').value;
+            const end = document.getElementById('comp-end').value;
+            const selectedPlayers = Array.from(document.getElementById('comp-players').selectedOptions).map(opt => opt.value);
+
+            if (!name || !start || !end || selectedPlayers.length !== 10) {
+                alert('Enter name, dates, and select exactly 10 players.');
+                return;
+            }
+
+            // Assign to teams (simple: first 5 to A, next to B - full balancing in Phase 4)
+            const teamA = selectedPlayers.slice(0, 5);
+            const teamB = selectedPlayers.slice(5, 10);
+
+            const id = 'carty_' + new Date(start).getFullYear();
+            const comp = {
+                id,
+                type: 'carty_weekend',
+                name,
+                start_date: start,
+                end_date: end,
+                status: 'upcoming',
+                teams: [
+                    { id: 'team_a', name: 'Team A', color: '#ef4444', players: teamA },
+                    { id: 'team_b', name: 'Team B', color: '#3b82f6', players: teamB }
+                ],
+                day1: { head_to_head: [] },
+                day2: {},
+                bonus: {},
+                team_results: {},
+                carty_winner: null,
+                booby_prize: null,
+                event_info: {} // Stub, Phase 5
+            };
+
+            AppState.competitions.push(comp);
+            if (!AppState.activeCompetition) AppState.activeCompetition = id;
+
+            const form = document.getElementById('competition-form');
+            form.reset();
+            renderCompetitionManagement();
+            AppState.save();
+        }
+
+        function setActiveCompetition(id) {
+            AppState.activeCompetition = id;
+            AppState.save();
+            alert('Set as active.');
+            renderHomeDashboard(); // Update home
+        }
+
+        function removeCompetition(id) {
+            if (confirm('Remove competition?')) {
+                AppState.competitions = AppState.competitions.filter(c => c.id !== id);
+                if (AppState.activeCompetition === id) AppState.activeCompetition = null;
+                renderCompetitionManagement();
+                AppState.save();
+            }
+        }
+
+        // Pairings Setup
+        function renderPairingsSetup(compId) {
+            const setup = document.getElementById('pairings-setup');
+            setup.style.display = 'block';
+
+            const comp = AppState.competitions.find(c => c.id === compId);
+            const teamA = comp.teams.find(t => t.id === 'team_a').players;
+            const teamB = comp.teams.find(t => t.id === 'team_b').players;
+
+            const rows = document.getElementById('pairings-rows');
+            rows.innerHTML = '';
+            for (let i = 0; i < 5; i++) {
+                const div = document.createElement('div');
+                div.className = 'pairing-row';
+                div.innerHTML = `
+                    <select data-team="a">
+                        <option value="">Select Team A</option>
+                        ${teamA.map(id => `<option value="${id}">${AppState.players.find(p => p.id === id).name}</option>`).join('')}
+                    </select>
+                    <span>vs</span>
+                    <select data-team="b">
+                        <option value="">Select Team B</option>
+                        ${teamB.map(id => `<option value="${id}">${AppState.players.find(p => p.id === id).name}</option>`).join('')}
+                    </select>
+                `;
+                rows.appendChild(div);
+            }
+
+            setup.dataset.compId = compId;
+        }
+
+        function savePairings() {
+            const setup = document.getElementById('pairings-setup');
+            const compId = setup.dataset.compId;
+            const comp = AppState.competitions.find(c => c.id === compId);
+            const rows = document.querySelectorAll('.pairing-row');
+
+            comp.day1.head_to_head = Array.from(rows).map(row => {
+                const a = row.querySelector('[data-team="a"]').value;
+                const b = row.querySelector('[data-team="b"]').value;
+                return {
+                    team_a_player: a,
+                    team_b_player: b,
+                    holes_won_a: 0,
+                    holes_won_b: 0,
+                    holes_halved: 0,
+                    result: null,
+                    points_team_a: 0,
+                    points_team_b: 0
+                };
+            });
+
+            // Validate 5 unique pairs
+            if (new Set(comp.day1.head_to_head.map(p => p.team_a_player)).size !== 5 || new Set(comp.day1.head_to_head.map(p => p.team_b_player)).size !== 5) {
+                alert('Select unique players for all 5 pairings.');
+                return;
+            }
+
+            AppState.save();
+            setup.style.display = 'none';
+            alert('Pairings saved.');
+        }
+
+        // Get Head-to-Head Status
+        function getHeadToHeadStatus() {
+            if (!AppState.activeCompetition) return '';
+            const comp = AppState.competitions.find(c => c.id === AppState.activeCompetition);
+            if (!comp.day1.head_to_head) return 'No pairings set.';
+
+            // Assume user is in pairings (stub, update with user_profile)
+            const userPairing = comp.day1.head_to_head.find(pair => pair.team_a_player === 'player_001'); // Example
+            if (!userPairing) return 'No pairing for you.';
+
+            const userPlayer = AppState.currentRound.players.find(p => p.player_id === userPairing.team_a_player);
+            const opponentPlayer = AppState.currentRound.players.find(p => p.player_id === userPairing.team_b_player);
+
+            const result = calculateHeadToHead(userPlayer.holes.map(h => h.points), opponentPlayer.holes.map(h => h.points));
+            const holesPlayed = userPlayer.holes.filter(h => h.gross !== null).length;
+
+            if (result.winner === 'halved') return 'All square through ' + holesPlayed;
+            const up = result.points_a > result.points_b ? result.points_a - result.points_b : result.points_b - result.points_a;
+            const leader = result.winner === 'player_a' ? 'You' : 'Opponent';
+            return `${leader} ${up} up through ${holesPlayed}`;
+        }
+
+        // calculateHeadToHead from Spec
+        function calculateHeadToHead(playerAHolePoints, playerBHolePoints) {
+            let aWins = 0, bWins = 0;
+            for (let i = 0; i < 18; i++) {
+                if (playerAHolePoints[i] > playerBHolePoints[i]) aWins++;
+                else if (playerBHolePoints[i] > playerAHolePoints[i]) bWins++;
+            }
+            if (aWins > bWins) return { winner: 'player_a', points_a: 1, points_b: 0 };
+            if (bWins > aWins) return { winner: 'player_b', points_a: 0, points_b: 1 };
+            return { winner: 'halved', points_a: 0.5, points_b: 0.5 };
+        }
+
+        // Manage History Functions
+        function renderManageHistory() {
+            // Populate winner select
+            const winnerSelect = document.getElementById('history-winner');
+            winnerSelect.innerHTML = '<option value="">Select Winner</option>';
+            AppState.players.forEach(player => {
+                const option = document.createElement('option');
+                option.value = player.id;
+                option.textContent = player.name;
+                winnerSelect.appendChild(option);
+            });
+
+            // For record form
+            const recordPlayer = document.getElementById('record-player');
+            recordPlayer.innerHTML = '<option value="">Select Player</option>';
+            AppState.players.forEach(player => {
+                const option = document.createElement('option');
+                option.value = player.id;
+                option.textContent = player.name;
+                recordPlayer.appendChild(option);
+            });
+
+            const recordCourse = document.getElementById('record-course');
+            recordCourse.innerHTML = '<option value="">Select Course</option>';
+            AppState.courses.forEach(course => {
+                const option = document.createElement('option');
+                option.value = course.id;
+                option.textContent = course.name;
+                recordCourse.appendChild(option);
+            });
+        }
+
+        function addPastWinner(event) {
+            event.preventDefault();
+            const year = parseInt(document.getElementById('history-year').value, 10);
+            const playerId = document.getElementById('history-winner').value;
+            const points = parseInt(document.getElementById('history-points').value, 10);
+
+            if (isNaN(year) || !playerId || isNaN(points)) return;
+
+            const name = AppState.players.find(p => p.id === playerId).name;
+            AppState.history.carty_winners.push({ year, player_id: playerId, name, points });
+
+            const form = document.getElementById('history-form');
+            form.reset();
+            AppState.save();
+            alert('Added past winner.');
+        }
+
+        function addRecord(event) {
+            event.preventDefault();
+            const type = document.getElementById('record-type').value;
+            const playerId = document.getElementById('record-player').value;
+            const value = parseInt(document.getElementById('record-value').value, 10);
+            const date = document.getElementById('record-date').value;
+            const courseId = document.getElementById('record-course').value;
+
+            if (!type || !playerId || isNaN(value) || !date || !courseId) return;
+
+            AppState.history.records[type] = { player_id: playerId, points: value, date, course_id: courseId }; // For highest_stableford, points = value; for lowest_gross, score = value
+
+            const form = document.getElementById('record-form');
+            form.reset();
+            AppState.save();
+            alert('Added record.');
+        }
+
+        // Stats Screen Rendering
+        function renderStatsScreen() {
+            showStatsTab('personal'); // Default
+        }
+
+        function showStatsTab(tabId) {
+            document.querySelectorAll('#stats .tab-button').forEach(btn => btn.classList.remove('active'));
+            document.querySelector(`button[onclick="showStatsTab('${tabId}')"]`).classList.add('active');
+
+            document.querySelectorAll('#stats .tab-content').forEach(content => content.classList.remove('active'));
+            document.getElementById(`${tabId}-tab`).classList.add('active');
+
+            if (tabId === 'personal') {
+                const user = AppState.players.find(p => p.name === AppState.user_profile.name) || { stats: {}, handicap: AppState.user_profile.default_handicap };
+                document.getElementById('best-stableford').textContent = user.stats.best_stableford || 'N/A';
+                document.getElementById('best-gross').textContent = user.stats.best_gross === Infinity ? 'N/A' : user.stats.best_gross;
+                document.getElementById('avg-stableford').textContent = user.stats.avg_stableford.toFixed(1) || 'N/A';
+                document.getElementById('rounds-played').textContent = user.stats.rounds_played || 0;
+                document.getElementById('handicap').textContent = user.handicap || AppState.user_profile.default_handicap;
+            } else if (tabId === 'carty-history') {
+                const body = document.getElementById('carty-history-body');
+                body.innerHTML = '';
+                AppState.history.carty_winners.sort((a, b) => b.year - a.year).forEach(winner => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `<td>${winner.year}</td><td>${winner.name}</td><td>${winner.points}</td>`;
+                    body.appendChild(tr);
+                });
+            } else if (tabId === 'course-records') {
+                const body = document.getElementById('course-records-body');
+                body.innerHTML = '';
+                AppState.courses.forEach(course => {
+                    const record = AppState.history.records.lowest_gross && AppState.history.records.lowest_gross.course_id === course.id ? AppState.history.records.lowest_gross : null;
+                    const playerName = record ? AppState.players.find(p => p.id === record.player_id).name : 'N/A';
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `<td>${course.name}</td><td>${record ? record.score : 'N/A'}</td><td>${playerName}</td><td>${record ? record.date : 'N/A'}</td>`;
+                    body.appendChild(tr);
+                });
+            } else if (tabId === 'head-to-head') {
+                const body = document.getElementById('head-to-head-body');
+                body.innerHTML = '';
+                const h2h = calculateHeadToHeadRecords();
+                Object.entries(h2h).forEach(([opponentId, record]) => {
+                    const opponent = AppState.players.find(p => p.id === opponentId);
+                    if (opponent) {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `<td>${opponent.name}</td><td>${record.wins}/${record.losses}/${record.draws}</td>`;
+                        body.appendChild(tr);
+                    }
+                });
+            }
+        }
+
+        // Calculate Head-to-Head Records
+        function calculateHeadToHeadRecords() {
+            const records = {};
+            AppState.competitions.forEach(comp => {
+                comp.day1.head_to_head.forEach(match => {
+                    if (match.result) {
+                        const a = match.team_a_player;
+                        const b = match.team_b_player;
+                        records[a] = records[a] || { wins: 0, losses: 0, draws: 0 };
+                        records[b] = records[b] || { wins: 0, losses: 0, draws: 0 };
+
+                        if (match.result === 'player_a') {
+                            records[a].wins++;
+                            records[b].losses++;
+                        } else if (match.result === 'player_b') {
+                            records[a].losses++;
+                            records[b].wins++;
+                        } else if (match.result === 'halved') {
+                            records[a].draws++;
+                            records[b].draws++;
+                        }
+                    }
+                });
+            });
+            return records;
+        }
+
+        // Initialize
+        if (document.getElementById('player-form')) {
+            document.getElementById('player-form').addEventListener('submit', addOrUpdatePlayer);
+            renderPlayerList();
+        }
+
+        if (document.getElementById('course-form')) {
+            generateHoleInputs();
+            document.getElementById('quick-setup').addEventListener('click', quickSetup);
+            document.getElementById('course-form').addEventListener('submit', addOrUpdateCourse);
+            renderCourseList();
+        }
+
+        if (document.getElementById('casual-round-form')) {
+            renderCasualRoundSetup();
+            document.getElementById('casual-round-form').addEventListener('submit', startCasualRound);
+        }
+
+        if (document.getElementById('competition-form')) {
+            document.getElementById('competition-form').addEventListener('submit', createCompetition);
+            renderCompetitionManagement();
+        }
+
+        if (document.getElementById('history-form')) {
+            document.getElementById('history-form').addEventListener('submit', addPastWinner);
+        }
+
+        if (document.getElementById('record-form')) {
+            document.getElementById('record-form').addEventListener('submit', addRecord);
+        }
+
+        // Render home on load if home
+        if (AppState.currentScreen === 'home') {
+            renderHomeDashboard();
+        }
+
+        // PWA Service Worker Registration
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js')
+                .then(reg => console.log('Service Worker registered', reg))
+                .catch(err => console.error('Service Worker registration failed', err));
+        }
+    </script>
+</body>
+</html>

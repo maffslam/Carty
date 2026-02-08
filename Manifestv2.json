@@ -1,0 +1,20 @@
+{
+  "short_name": "CARTY",
+  "name": "CARTY Golf App",
+  "icons": [
+    {
+      "src": "assets/icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "assets/icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": ".",
+  "background_color": "#f9fafb",
+  "theme_color": "#16a34a",
+  "display": "standalone"
+}
